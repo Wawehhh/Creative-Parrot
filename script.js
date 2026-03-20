@@ -216,29 +216,43 @@ function iconHoverBounce() {
     });
   });
 }
+// Initialize EmailJS with your public key
 
 function setupContactForm() {
   if (!contactForm) return;
+
   contactForm.addEventListener("submit", (event) => {
     event.preventDefault();
-    if (!contactForm.checkValidity()) {
-      contactForm.reportValidity();
-      return;
-    }
+    
     const submitButton = contactForm.querySelector('button[type="submit"]');
-    if (submitButton) {
-      submitButton.textContent = "Sent";
-      submitButton.disabled = true;
-    }
-    setTimeout(() => {
-      contactForm.reset();
-      if (submitButton) {
-        submitButton.textContent = "Submit";
+    submitButton.textContent = "Sending...";
+    submitButton.disabled = true;
+
+    // These names must match the "name" attribute in your HTML inputs
+    const formData = {
+      name: contactForm.name.value,
+      email: contactForm.email.value,
+      message: contactForm.message.value
+    };
+
+    // Replace these strings with your ACTUAL IDs from EmailJS dashboard
+    emailjs.send("service_acxhgoi", "template_65zalmw", formData)
+      .then(() => {
+        submitButton.textContent = "Sent!";
+        contactForm.reset();
+        alert("Message sent successfully!");
+        
+        setTimeout(() => {
+          submitButton.textContent = "Submit";
+          submitButton.disabled = false;
+        }, 3000);
+      })
+      .catch((err) => {
+        console.error("Failed to send:", err);
+        submitButton.textContent = "Error!";
         submitButton.disabled = false;
-      }
-      trackEvent("contact_submit", { form: "contact" });
-      alert("Thanks for reaching out! Creative Parrot will contact you soon.");
-    }, 380);
+        alert("Failed to send message. Please try again.");
+      });
   });
 }
 
