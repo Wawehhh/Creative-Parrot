@@ -4,641 +4,54 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Creative Parrot</title>
-    <!-- Standard favicon -->
-    <link rel="icon" href="assets/images/parrot-hero.png" type="image/png">
-
-    <meta
-      name="description"
-      content="Creative Parrot is a premium creative agency crafting memorable digital experiences."
-    />
+    <link rel="icon" href="assets/images/parrot-hero.png" type="image/png" />
+    <meta name="description" content="Creative Parrot is a premium creative agency crafting memorable digital experiences." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
-            fontFamily: {
-              sans: ["Poppins", "sans-serif"],
-            },
-            colors: {
-              gold: "#facc15",
-            },
+            fontFamily: { sans: ["Poppins", "sans-serif"] },
+            colors: { gold: "#facc15" },
             boxShadow: {
               neon: "0 0 26px rgba(250, 204, 21, 0.25)",
-              "soft-red": "0 0 26px rgba(251, 113, 133, 0.2)",
-            },
-          },
-        },
+              "soft-red": "0 0 26px rgba(251, 113, 133, 0.2)"
+            }
+          }
+        }
       };
     </script>
-    <script>
-      // Basic analytics (optional). Paste your GA4 measurement id below.
-      // Leave empty to disable network calls.
-      (function () {
-        var GA_ID = "";
-        window.dataLayer = window.dataLayer || [];
-        window.gtag =
-          window.gtag ||
-          function () {
-            window.dataLayer.push(arguments);
-          };
-        if (!GA_ID) return;
-        var s = document.createElement("script");
-        s.async = true;
-        s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_ID;
-        document.head.appendChild(s);
-        window.gtag("js", new Date());
-        window.gtag("config", GA_ID);
-      })();
-    </script>
-    <style>
-      :root {
-        --gradient-primary: linear-gradient(120deg, #f97316, #ef4444, #facc15);
-        --gradient-warm: linear-gradient(120deg, #facc15, #f97316);
-        --gradient-hero: linear-gradient(115deg, #ef4444, #f97316, #facc15);
-        --bg-main: #000000;
-        --surface-main: #0b0b0b;
-        --surface-alt: #0d0d0d;
-        --text-primary: #ffffff;
-        --text-secondary: #d4d4d8;
-        --text-muted: #a1a1aa;
-        --nav-bg: rgba(8, 8, 8, 0.82);
-        --nav-border: rgba(250, 204, 21, 0.22);
-        --mobile-bg: rgba(9, 9, 11, 0.92);
-        --mobile-border: #27272a;
-        --input-bg: #09090b;
-        --input-border: rgba(253, 224, 71, 0.45);
-        --input-text: #e4e4e7;
-        --footer-border: #27272a;
-      }
-
-      html[data-theme="light"] {
-        --bg-main: #f8fafc;
-        --surface-main: #ffffff;
-        --surface-alt: #f8fafc;
-        --text-primary: #0f172a;
-        --text-secondary: #1e293b;
-        --text-muted: #475569;
-        --nav-bg: rgba(248, 250, 252, 0.82);
-        --nav-border: rgba(234, 179, 8, 0.3);
-        --mobile-bg: rgba(255, 255, 255, 0.95);
-        --mobile-border: #cbd5e1;
-        --input-bg: #ffffff;
-        --input-border: rgba(202, 138, 4, 0.5);
-        --input-text: #0f172a;
-        --footer-border: #cbd5e1;
-      }
-
-      body {
-        background: var(--bg-main);
-        color: var(--text-primary);
-        transition: background-color 300ms ease, color 300ms ease;
-      }
-
-      body,
-      header,
-      section,
-      article,
-      nav,
-      footer,
-      a,
-      button,
-      input,
-      textarea,
-      .icon-shell,
-      .card-divider {
-        transition:
-          background-color 360ms ease,
-          color 360ms ease,
-          border-color 360ms ease,
-          box-shadow 360ms ease,
-          filter 360ms ease;
-      }
-
-      #theme-transition {
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        z-index: 80;
-        opacity: 0;
-        background: radial-gradient(circle at var(--x, 50%) var(--y, 20%), rgba(250, 204, 21, 0.2), transparent 38%);
-      }
-
-      body.theme-switching #theme-transition {
-        animation: themePulse 520ms ease;
-      }
-
-      .text-gradient-warm {
-        background: var(--gradient-hero);
-        background-size: 220% 220%;
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: gradientShift 7s ease infinite;
-      }
-
-      .text-gradient-parrot {
-        background: linear-gradient(120deg, #22c55e, #14b8a6, #3b82f6);
-        background-size: 220% 220%;
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: gradientShift 8s ease infinite;
-      }
-
-      .gradient-border {
-        position: relative;
-        border: 1px solid transparent;
-        background:
-          linear-gradient(var(--surface-main), var(--surface-main)) padding-box,
-          var(--gradient-primary) border-box;
-      }
-
-      .gradient-border-min {
-        position: relative;
-        border: 1px solid transparent;
-        background:
-          linear-gradient(var(--surface-alt), var(--surface-alt)) padding-box,
-          var(--gradient-primary) border-box;
-      }
-
-      .glow-hover {
-        transition: transform 320ms ease, box-shadow 320ms ease, border-color 320ms ease;
-      }
-
-      .glow-hover:hover {
-        transform: translateY(-6px);
-        box-shadow:
-          0 0 24px rgba(250, 204, 21, 0.18),
-          0 0 42px rgba(249, 115, 22, 0.12);
-      }
-
-      .reveal {
-        opacity: 0;
-        transform: translateY(36px);
-        transition: opacity 720ms ease, transform 720ms ease;
-      }
-
-      .reveal.revealed {
-        opacity: 1;
-        transform: translateY(0);
-      }
-
-      .nav-scrolled {
-        background: var(--nav-bg);
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid var(--nav-border);
-      }
-
-      .theme-toggle {
-        border: 1px solid rgba(250, 204, 21, 0.35);
-        background: linear-gradient(120deg, rgba(250, 204, 21, 0.18), rgba(249, 115, 22, 0.12));
-      }
-
-      .nav-cta,
-      .hero-cta {
-        color: #fde68a;
-      }
-
-      html[data-theme="light"] #bg-base {
-        background: #f8fafc;
-      }
-
-      html[data-theme="light"] #bg-glow {
-        background:
-          radial-gradient(circle at 20% 20%, rgba(250, 204, 21, 0.16), transparent 34%),
-          radial-gradient(circle at 80% 25%, rgba(249, 115, 22, 0.12), transparent 30%);
-      }
-
-      html[data-theme="light"] .text-zinc-100,
-      html[data-theme="light"] .text-zinc-200 {
-        color: var(--text-secondary) !important;
-      }
-
-      html[data-theme="light"] .text-zinc-300,
-      html[data-theme="light"] .text-zinc-400,
-      html[data-theme="light"] .text-zinc-500 {
-        color: var(--text-muted) !important;
-      }
-
-      html[data-theme="light"] .border-zinc-800,
-      html[data-theme="light"] .border-zinc-700 {
-        border-color: #cbd5e1 !important;
-      }
-
-      html[data-theme="light"] .bg-zinc-950,
-      html[data-theme="light"] .bg-black\/90 {
-        background-color: var(--input-bg) !important;
-      }
-
-      html[data-theme="light"] .placeholder\:text-zinc-500::placeholder {
-        color: #64748b !important;
-      }
-
-      html[data-theme="light"] .input-ring {
-        color: var(--input-text) !important;
-        border-color: var(--input-border) !important;
-      }
-
-      html[data-theme="light"] .text-white {
-        color: #111827 !important;
-      }
-
-      html[data-theme="light"] .nav-cta,
-      html[data-theme="light"] .hero-cta {
-        color: #111827 !important;
-        border-color: rgba(202, 138, 4, 0.5) !important;
-        background: linear-gradient(120deg, rgba(250, 204, 21, 0.45), rgba(249, 115, 22, 0.34)) !important;
-        text-shadow: none;
-      }
-
-      .service-card,
-      .why-card {
-        display: flex;
-        flex-direction: column;
-        min-height: 100%;
-        overflow: hidden;
-      }
-
-      .card-head {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-
-      .icon-shell {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        height: 3.25rem;
-        width: 3.25rem;
-        min-height: 3.25rem;
-        min-width: 3.25rem;
-        overflow: hidden;
-        border-radius: 0.9rem;
-        border: 1px solid rgba(250, 204, 21, 0.35);
-        background: linear-gradient(140deg, rgba(250, 204, 21, 0.16), rgba(249, 115, 22, 0.12));
-        box-shadow: inset 0 0 16px rgba(250, 204, 21, 0.08);
-      }
-
-      .card-icon {
-        width: 72%;
-        height: 72%;
-        object-fit: contain;
-        filter: invert(1) brightness(1.2) contrast(1.05);
-      }
-
-      .card-divider {
-        margin-top: 0.95rem;
-        margin-bottom: 0.95rem;
-        height: 1px;
-        width: 100%;
-        background: linear-gradient(90deg, rgba(250, 204, 21, 0.45), rgba(249, 115, 22, 0.18), transparent);
-      }
-
-      .service-list {
-        margin-top: 0.35rem;
-      }
-
-      .service-list li::marker {
-        color: #facc15;
-      }
-
-      .why-copy {
-        margin-top: 0.35rem;
-        line-height: 1.65;
-      }
-
-      .bento-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 0.85rem;
-      }
-
-      @media (min-width: 768px) {
-        .bento-grid {
-          grid-template-columns: repeat(10, minmax(0, 1fr));
-          grid-auto-rows: 96px;
-          gap: 0.95rem;
-        }
-
-        .bento-a { grid-column: span 6 / span 6; grid-row: span 3 / span 3; }
-        .bento-b { grid-column: span 4 / span 4; grid-row: span 2 / span 2; }
-        .bento-c { grid-column: span 4 / span 4; grid-row: span 2 / span 2; }
-        .bento-d { grid-column: span 3 / span 3; grid-row: span 2 / span 2; }
-        .bento-e { grid-column: span 3 / span 3; grid-row: span 2 / span 2; }
-        .bento-f { grid-column: span 4 / span 4; grid-row: span 3 / span 3; }
-        .bento-g { grid-column: span 3 / span 3; grid-row: span 2 / span 2; }
-        .bento-h { grid-column: span 3 / span 3; grid-row: span 2 / span 2; }
-      }
-
-      .portfolio-tile {
-        position: relative;
-        overflow: hidden;
-        border: 1px solid rgba(250, 204, 21, 0.32);
-        background: linear-gradient(130deg, rgba(24, 24, 27, 0.86), rgba(9, 9, 11, 0.92));
-      }
-
-      .portfolio-tile::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at top right, rgba(250, 204, 21, 0.15), transparent 50%);
-      }
-
-      .portfolio-tag {
-        border: 1px solid rgba(250, 204, 21, 0.45);
-        background: rgba(250, 204, 21, 0.12);
-      }
-
-      .portfolio-media {
-        position: relative;
-        display: flex;
-        min-height: 100%;
-        align-items: center;
-        justify-content: center;
-        border-radius: 0.7rem;
-        border: 1px dashed rgba(250, 250, 250, 0.2);
-        background: linear-gradient(140deg, rgba(0, 0, 0, 0.24), rgba(20, 20, 20, 0.24));
-      }
-
-      .portfolio-dim-label {
-        pointer-events: none;
-        position: relative;
-        z-index: 1;
-        font-size: 0.7rem;
-        font-weight: 600;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: rgba(250, 204, 21, 0.72);
-        text-shadow: 0 0 20px rgba(250, 204, 21, 0.25);
-      }
-
-      .portfolio-media > img.portfolio-img {
-        position: absolute;
-        inset: 0;
-        z-index: 0;
-        width: 100%;
-        height: 100%;
-        border-radius: 0.65rem;
-        object-fit: cover;
-      }
-
-      .portfolio-media:has(> img) .portfolio-dim-label {
-        display: none;
-      }
-
-      html[data-theme="light"] .icon-shell {
-        border-color: rgba(202, 138, 4, 0.45);
-        background: linear-gradient(140deg, rgba(250, 204, 21, 0.26), rgba(249, 115, 22, 0.14));
-        box-shadow: inset 0 0 12px rgba(202, 138, 4, 0.11);
-      }
-
-      html[data-theme="light"] .card-icon {
-        filter: none;
-      }
-
-      html[data-theme="light"] .card-divider {
-        background: linear-gradient(90deg, rgba(202, 138, 4, 0.62), rgba(249, 115, 22, 0.28), transparent);
-      }
-
-      html[data-theme="light"] .portfolio-tile {
-        border-color: rgba(202, 138, 4, 0.4);
-        background: linear-gradient(130deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.95));
-      }
-
-      html[data-theme="light"] .portfolio-tag {
-        border-color: rgba(202, 138, 4, 0.46);
-        background: rgba(234, 179, 8, 0.14);
-      }
-
-      html[data-theme="light"] .portfolio-media {
-        border-color: rgba(100, 116, 139, 0.35);
-        background: linear-gradient(140deg, rgba(255, 255, 255, 0.76), rgba(241, 245, 249, 0.92));
-      }
-
-      html[data-theme="light"] .portfolio-dim-label {
-        color: rgba(180, 83, 9, 0.85);
-        text-shadow: none;
-      }
-
-      .menu-panel {
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 300ms ease;
-      }
-
-      .menu-panel.open {
-        max-height: 340px;
-      }
-
-      .scroll-indicator::before {
-        content: "";
-        position: absolute;
-        left: 50%;
-        top: 4px;
-        width: 2px;
-        height: 12px;
-        transform: translateX(-50%);
-        background: #facc15;
-        border-radius: 9999px;
-        animation: scrollPulse 1.4s ease infinite;
-      }
-
-      .input-ring:focus {
-        box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.22), 0 0 18px rgba(250, 204, 21, 0.2);
-      }
-
-      .contact-social-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        transition: transform 200ms ease, filter 200ms ease;
-      }
-
-      .contact-social-icon {
-        width: 52px;
-        height: 52px;
-        object-fit: contain;
-        filter: invert(1) brightness(1.2) contrast(1.05);
-      }
-
-      .contact-social-link:hover {
-        transform: translateY(-2px) scale(1.05);
-      }
-
-      html[data-theme="light"] .contact-social-icon {
-        filter: none;
-      }
-
-      @keyframes gradientShift {
-        0% {
-          background-position: 0% 50%;
-        }
-        50% {
-          background-position: 100% 50%;
-        }
-        100% {
-          background-position: 0% 50%;
-        }
-      }
-
-      @keyframes float {
-        0% {
-          transform: translate3d(0, 0, 0);
-        }
-        50% {
-          transform: translate3d(0, -14px, 0);
-        }
-        100% {
-          transform: translate3d(0, 0, 0);
-        }
-      }
-
-      @keyframes scrollPulse {
-        0% {
-          transform: translate(-50%, 0);
-          opacity: 1;
-        }
-        100% {
-          transform: translate(-50%, 12px);
-          opacity: 0;
-        }
-      }
-
-      @keyframes themePulse {
-        0% {
-          opacity: 0;
-          transform: scale(0.98);
-        }
-        35% {
-          opacity: 1;
-          transform: scale(1);
-        }
-        100% {
-          opacity: 0;
-          transform: scale(1.02);
-        }
-      }
-
-      /* Chat widget (bonus) */
-      #chat-launcher {
-        position: fixed;
-        right: 18px;
-        bottom: 18px;
-        z-index: 60;
-        border: 1px solid rgba(250, 204, 21, 0.42);
-        background: radial-gradient(circle at 20% 20%, rgba(250, 204, 21, 0.22), transparent 45%),
-          rgba(0, 0, 0, 0.6);
-        backdrop-filter: blur(8px);
-        box-shadow: 0 0 28px rgba(250, 204, 21, 0.12);
-        color: rgba(250, 204, 21, 0.95);
-      }
-
-      #chat-launcher:hover {
-        box-shadow: 0 0 34px rgba(250, 204, 21, 0.18);
-      }
-
-      #chat-modal {
-        position: fixed;
-        right: 18px;
-        bottom: 74px;
-        z-index: 60;
-        width: min(360px, calc(100vw - 36px));
-        border: 1px solid rgba(250, 204, 21, 0.32);
-        background: rgba(7, 7, 9, 0.92);
-        backdrop-filter: blur(10px);
-        box-shadow: 0 0 38px rgba(250, 204, 21, 0.14);
-        transform-origin: bottom right;
-        opacity: 0;
-        pointer-events: none;
-        transform: translateY(12px) scale(0.98);
-        transition: opacity 200ms ease, transform 220ms ease;
-      }
-
-      #chat-modal.open {
-        opacity: 1;
-        pointer-events: auto;
-        transform: translateY(0) scale(1);
-      }
-
-      html[data-theme="light"] #chat-modal {
-        background: rgba(248, 250, 252, 0.95);
-      }
-
-      #chat-messages {
-        max-height: 280px;
-        overflow: auto;
-      }
-
-      .chat-bubble {
-        max-width: 86%;
-        border: 1px solid rgba(250, 204, 21, 0.22);
-        background: rgba(14, 14, 18, 0.75);
-        border-radius: 14px;
-        padding: 10px 12px;
-        box-shadow: 0 0 20px rgba(250, 204, 21, 0.08);
-      }
-
-      html[data-theme="light"] .chat-bubble {
-        background: rgba(255, 255, 255, 0.85);
-      }
-
-      .chat-bubble.user {
-        margin-left: auto;
-        background: linear-gradient(120deg, rgba(250, 204, 21, 0.22), rgba(249, 115, 22, 0.12));
-      }
-    </style>
+    <link rel="stylesheet" href="assets/styles.css" />
   </head>
   <body class="font-sans text-white antialiased selection:bg-yellow-400/30">
     <div id="bg-base" class="fixed inset-0 -z-10 bg-black"></div>
-    <div
-      id="bg-glow"
-      class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(250,204,21,0.12),transparent_30%),radial-gradient(circle_at_80%_30%,rgba(239,68,68,0.10),transparent_28%)]"
-    ></div>
+    <div id="bg-glow" class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(250,204,21,0.12),transparent_30%),radial-gradient(circle_at_80%_30%,rgba(239,68,68,0.10),transparent_28%)]"></div>
     <div id="theme-transition" aria-hidden="true"></div>
 
     <header id="navbar" class="fixed top-0 z-50 w-full transition-all duration-300">
       <nav class="mx-auto max-w-7xl px-5 py-4 md:px-8">
         <div class="flex items-center justify-between">
-          <a href="#home" class="flex items-center gap-.5">
+          <a href="index.html" class="flex items-center gap-.5">
             <img src="assets/images/logo.png" alt="Creative Parrot logo" class="h-10 w-auto max-w-[64px] object-contain" />
           </a>
-
           <ul class="hidden items-center gap-7 md:flex">
-            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="#home">Home</a></li>
-            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="#about">About</a></li>
-            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="#services">Services</a></li>
-            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="#why-us">Why Us</a></li>
-            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="#portfolio">Portfolio</a></li>
-            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="#blog">Blog</a></li>
-            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="#contact">Contact</a></li>
+            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="index.html">Home</a></li>
+            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="about.html">About</a></li>
+            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="services.html">Services</a></li>
+            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="why.html">Why Us</a></li>
+            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="portfolio.html">Portfolio</a></li>
+            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="blog.html">Blog</a></li>
+            <li><a class="nav-link relative text-sm uppercase tracking-[0.2em] text-zinc-300 transition hover:text-gold" href="contact.html">Contact</a></li>
           </ul>
-
           <div class="flex items-center gap-3">
-            <button
-              id="theme-toggle"
-              type="button"
-              aria-label="Switch to light mode"
-              class="theme-toggle inline-flex h-10 w-10 items-center justify-center rounded-full text-sm text-yellow-200 transition hover:scale-105 hover:shadow-neon"
-            >
+            <button id="theme-toggle" type="button" aria-label="Switch to light mode" class="theme-toggle inline-flex h-10 w-10 items-center justify-center rounded-full text-sm text-yellow-200 transition hover:scale-105 hover:shadow-neon">
               <span id="theme-icon" aria-hidden="true">☀</span>
             </button>
-            <a
-              href="#contact"
-              class="nav-cta hidden rounded-full border border-yellow-400/40 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-gold shadow-neon transition hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(250,204,21,0.35)] md:inline-block"
-              >Work With Us</a
-            >
-            <button
-              id="menu-btn"
-              aria-label="Toggle menu"
-              class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-zinc-700 text-zinc-200 transition hover:border-yellow-400/70 hover:text-yellow-300 md:hidden"
-            >
+            <a href="contact.html" class="nav-cta hidden rounded-full border border-yellow-400/40 bg-gradient-to-r from-yellow-400/20 to-orange-500/20 px-5 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-gold shadow-neon transition hover:scale-[1.03] hover:shadow-[0_0_24px_rgba(250,204,21,0.35)] md:inline-block">Work With Us</a>
+            <button id="menu-btn" aria-label="Toggle menu" class="inline-flex h-10 w-10 items-center justify-center rounded-md border border-zinc-700 text-zinc-200 transition hover:border-yellow-400/70 hover:text-yellow-300 md:hidden">
               <span class="space-y-1.5">
                 <span class="block h-0.5 w-5 bg-current"></span>
                 <span class="block h-0.5 w-5 bg-current"></span>
@@ -647,23 +60,22 @@
             </button>
           </div>
         </div>
-
         <div id="mobile-menu" class="menu-panel md:hidden">
           <div class="mt-4 space-y-2 rounded-xl border border-zinc-800 bg-zinc-950/90 p-3" style="background: var(--mobile-bg); border-color: var(--mobile-border);">
-            <a href="#home" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Home</a>
-            <a href="#about" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">About</a>
-            <a href="#services" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Services</a>
-            <a href="#why-us" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Why Us</a>
-            <a href="#portfolio" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Portfolio</a>
-            <a href="#blog" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Blog</a>
-            <a href="#contact" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Contact</a>
+            <a href="index.html" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Home</a>
+            <a href="about.html" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">About</a>
+            <a href="services.html" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Services</a>
+            <a href="why.html" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Why Us</a>
+            <a href="portfolio.html" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Portfolio</a>
+            <a href="blog.html" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Blog</a>
+            <a href="contact.html" class="mobile-link block rounded-md px-3 py-2 text-sm text-zinc-200 transition hover:bg-zinc-900 hover:text-gold">Contact</a>
           </div>
         </div>
       </nav>
     </header>
 
     <main>
-      <section id="home" class="relative overflow-hidden pt-28">
+      <section class="relative overflow-hidden pt-28">
         <div class="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-5 pb-16 pt-8 md:px-8 lg:grid-cols-2 lg:pb-24">
           <div>
             <p class="reveal mb-4 text-xs uppercase tracking-[0.35em] text-zinc-300">Creative Digital Agency</p>
@@ -673,397 +85,75 @@
               <span class="reveal mt-2 block text-gradient-parrot">PARROT</span>
             </h1>
             <p class="reveal mt-6 max-w-xl text-base leading-relaxed text-zinc-300">
-              Founded with the vision of empowering businesses through effective digital storytelling 
-              and strategic marketing, Creative Parrot blends creativity with data-driven strategies to 
-              produce impactful content, compelling designs, and meaningful online engagement. 
+              Founded with the vision of empowering businesses through effective digital storytelling and strategic marketing, Creative Parrot blends creativity with data-driven strategies.
             </p>
             <div class="reveal mt-9">
-              <a
-                href="#contact"
-                class="hero-cta inline-flex items-center rounded-full border border-yellow-300/40 bg-gradient-to-r from-yellow-300/25 via-orange-500/20 to-rose-500/20 px-7 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-yellow-200 shadow-neon transition duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(250,204,21,0.45)]"
-                >Let's Talk</a
-              >
+              <a href="contact.html" class="hero-cta inline-flex items-center rounded-full border border-yellow-300/40 bg-gradient-to-r from-yellow-300/25 via-orange-500/20 to-rose-500/20 px-7 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-yellow-200 shadow-neon transition duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(250,204,21,0.45)]">Let's Talk</a>
             </div>
           </div>
-
           <div class="reveal relative">
             <div class="absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-red-500/20 via-orange-400/20 to-yellow-300/20 blur-3xl"></div>
-            <img
-              id="parrot-image"
-              src="assets/images/parrot-hero.png"
-              alt="Creative parrot hero"
-              class="mx-auto w-full max-w-md rounded-3xl object-contain drop-shadow-[0_0_35px_rgba(250,204,21,0.28)]"
-              style="animation: float 5.5s ease-in-out infinite;"
-            />
+            <img id="parrot-image" src="assets/images/parrot-hero.png" alt="Creative parrot hero" class="mx-auto w-full max-w-md rounded-3xl object-contain drop-shadow-[0_0_35px_rgba(250,204,21,0.28)]" style="animation: float 5.5s ease-in-out infinite;" />
           </div>
-        </div>
-
-        <div class="pb-10 text-center">
-          <div class="scroll-indicator relative mx-auto h-8 w-5 rounded-full border border-gold/60"></div>
         </div>
       </section>
 
-      <section id="about" class="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
+      <section class="mx-auto max-w-6xl px-5 py-14 md:px-8 md:py-18">
         <div class="reveal text-center">
-          <h2 class="text-3xl font-bold uppercase tracking-[0.22em] text-zinc-100 md:text-4xl">About Us</h2>
+          <h2 class="text-3xl font-bold uppercase tracking-[0.22em] text-zinc-100 md:text-4xl">About Preview</h2>
           <p class="mx-auto mt-6 max-w-3xl text-zinc-300">
-            Creative Parrot is a creative digital marketing and social media solutions agency dedicated to helping businesses build a strong and engaging online presence.
+            Creative Parrot is a creative digital marketing and social media solutions agency dedicated to helping businesses build a strong and engaging online presence through strategy, design, and storytelling.
           </p>
-          <p class="mx-auto mt-6 max-w-3xl text-zinc-300">
-            With a focus on creativity, strategy, and innovation, Creative Parrot provides tailored social media management, branding, graphic design, and digital marketing services that help brands connect with their audience and grow in the digital world.
-          </p>
-        </div>
-        <div class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
-          <article class="reveal gradient-border glow-hover rounded-2xl p-7">
-            <h3 class="text-xl font-semibold uppercase tracking-[0.18em] text-gold">Mission</h3>
-            <p class="mt-4 leading-relaxed text-zinc-300">
-              To help businesses grow and succeed in the digital space through creative marketing strategies, 
-              engaging content, and innovative design solutions.</p>
-          </article>
-          <article class="reveal gradient-border glow-hover rounded-2xl p-7">
-            <h3 class="text-xl font-semibold uppercase tracking-[0.18em] text-gold">Vision</h3>
-            <p class="mt-4 leading-relaxed text-zinc-300">
-              To become a trusted creative partner for businesses seeking impactful digital presence, powerful branding, and effective social media growth.
-            </p>
-          </article>
-        </div>
-        <div class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-          <article class="reveal gradient-border-min rounded-2xl p-6">
-            <h3 class="text-sm font-semibold uppercase tracking-[0.18em] text-gold">Core Values 1</h3>
-          </article>
-          <article class="reveal gradient-border-min rounded-2xl p-6">
-            <h3 class="text-sm font-semibold uppercase tracking-[0.18em] text-gold">Core Values 2</h3>
-          </article>
-          <article class="reveal gradient-border-min rounded-2xl p-6">
-            <h3 class="text-sm font-semibold uppercase tracking-[0.18em] text-gold">Core Values 3</h3>
-          </article>
+          <a href="about.html" class="mt-8 inline-flex rounded-full border border-yellow-300/35 px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gold transition hover:shadow-neon">Learn More</a>
         </div>
       </section>
 
-      <section id="services" class="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
-        <div class="reveal mb-12 text-center">
-          <h2 class="text-3xl font-bold uppercase tracking-[0.22em] md:text-4xl">Services</h2>
-          <p class="mx-auto mt-5 max-w-2xl text-zinc-300">From concept to campaign, we build cohesive brand systems that move markets.</p>
+      <section class="mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-18">
+        <div class="reveal mb-10 text-center">
+          <h2 class="text-3xl font-bold uppercase tracking-[0.22em] md:text-4xl">Services Preview</h2>
         </div>
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
           <article class="service-card reveal gradient-border rounded-2xl p-6 transition duration-300 hover:scale-[1.03] hover:shadow-neon">
-            <div class="card-head">
-              <span class="icon-shell">
-                <img src="assets/icons/service1.png" alt="Social media management icon" class="service-icon card-icon" />
-              </span>
-              <h3 class="text-lg font-semibold uppercase tracking-[0.16em]">Social Media Management</h3>
-            </div>
-            <div class="card-divider"></div>
-            <ul class="service-list list-disc space-y-1 pl-5 text-sm leading-relaxed text-zinc-300">
-              <li>Social Media Strategy Development</li>
-              <li>Content Planning and Scheduling</li>
-              <li>Audience Engagement and Community Management</li>
-            </ul>
+            <div class="card-head"><span class="icon-shell"><img src="assets/icons/service1.png" alt="" class="service-icon card-icon" /></span><h3 class="text-lg font-semibold uppercase tracking-[0.16em]">Social Media Management</h3></div>
+            <div class="card-divider"></div><p class="text-sm text-zinc-300">Strategy, planning, and community engagement to grow your audience.</p>
           </article>
           <article class="service-card reveal gradient-border rounded-2xl p-6 transition duration-300 hover:scale-[1.03] hover:shadow-neon">
-            <div class="card-head">
-              <span class="icon-shell">
-                <img src="assets/icons/service2.png" alt="Creative design icon" class="service-icon card-icon" />
-              </span>
-              <h3 class="text-lg font-semibold uppercase tracking-[0.16em]">Creative Design</h3>
-            </div>
-            <div class="card-divider"></div>
-            <ul class="service-list list-disc space-y-1 pl-5 text-sm leading-relaxed text-zinc-300">
-              <li>Logo and Brand Identity Design</li>
-              <li>Social Media Graphics and Marketing Materials</li>
-              <li>Promotional and Advertising Creatives</li>
-            </ul>
+            <div class="card-head"><span class="icon-shell"><img src="assets/icons/service2.png" alt="" class="service-icon card-icon" /></span><h3 class="text-lg font-semibold uppercase tracking-[0.16em]">Creative Design</h3></div>
+            <div class="card-divider"></div><p class="text-sm text-zinc-300">Brand identity, social visuals, and campaign creatives with impact.</p>
           </article>
           <article class="service-card reveal gradient-border rounded-2xl p-6 transition duration-300 hover:scale-[1.03] hover:shadow-neon">
-            <div class="card-head">
-              <span class="icon-shell">
-                <img src="assets/icons/service3.png" alt="Digital marketing icon" class="service-icon card-icon" />
-              </span>
-              <h3 class="text-lg font-semibold uppercase tracking-[0.16em]">Digital Marketing</h3>
-            </div>
-            <div class="card-divider"></div>
-            <ul class="service-list list-disc space-y-1 pl-5 text-sm leading-relaxed text-zinc-300">
-              <li>Social Media Marketing Campaigns</li>
-              <li>Content Marketing Strategies</li>
-              <li>Online Brand Promotion</li>
-            </ul>
+            <div class="card-head"><span class="icon-shell"><img src="assets/icons/service3.png" alt="" class="service-icon card-icon" /></span><h3 class="text-lg font-semibold uppercase tracking-[0.16em]">Digital Marketing</h3></div>
+            <div class="card-divider"></div><p class="text-sm text-zinc-300">Campaign execution designed to boost visibility and conversion.</p>
           </article>
-          <article class="service-card reveal gradient-border rounded-2xl p-6 transition duration-300 hover:scale-[1.03] hover:shadow-neon">
-            <div class="card-head">
-              <span class="icon-shell">
-                <img src="assets/icons/service4.png" alt="Web and digital solutions icon" class="service-icon card-icon" />
-              </span>
-              <h3 class="text-lg font-semibold uppercase tracking-[0.16em]">Web &amp; Digital Solutions</h3>
-            </div>
-            <div class="card-divider"></div>
-            <ul class="service-list list-disc space-y-1 pl-5 text-sm leading-relaxed text-zinc-300">
-              <li>Website Design and Development</li>
-              <li>Landing Page Creation</li>
-              <li>Digital Brand Optimization</li>
-            </ul>
-          </article>
+        </div>
+        <div class="mt-8 text-center">
+          <a href="services.html" class="inline-flex rounded-full border border-yellow-300/35 px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gold transition hover:shadow-neon">View All Services</a>
         </div>
       </section>
 
-      <section id="why-us" class="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
-        <div class="reveal mb-12 text-center">
-          <h2 class="text-3xl font-bold uppercase tracking-[0.22em] md:text-4xl">Why Choose Creative Parrot</h2>
-          <p class="mx-auto mt-5 max-w-2xl text-zinc-300">We combine strategy, creativity, and execution quality to deliver premium outcomes.</p>
+      <section class="mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-18">
+        <div class="reveal mb-10 text-center">
+          <h2 class="text-3xl font-bold uppercase tracking-[0.22em] md:text-4xl">Portfolio Preview</h2>
         </div>
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          <article class="why-card reveal gradient-border-min rounded-2xl p-6 glow-hover">
-            <div class="card-head">
-              <span class="icon-shell">
-                <img src="assets/icons/feature1.png" alt="Experience icon" class="card-icon" />
-              </span>
-              <h3 class="text-base font-semibold uppercase tracking-[0.14em]">Creative Approach</h3>
-            </div>
-            <div class="card-divider"></div>
-            <p class="why-copy text-sm text-zinc-300">We combine creativity and strategy to build visually engaging and impactful content.</p>
-          </article>
-          <article class="why-card reveal gradient-border-min rounded-2xl p-6 glow-hover">
-            <div class="card-head">
-              <span class="icon-shell">
-                <img src="assets/icons/feature2.png" alt="Agile icon" class="card-icon" />
-              </span>
-              <h3 class="text-base font-semibold uppercase tracking-[0.14em]">Customized Strategies</h3>
-            </div>
-            <div class="card-divider"></div>
-            <p class="why-copy text-sm text-zinc-300">Every business is unique, so we create tailored marketing solutions that fit your brand goals.</p>
-          </article>
-          <article class="why-card reveal gradient-border-min rounded-2xl p-6 glow-hover">
-            <div class="card-head">
-              <span class="icon-shell">
-                <img src="assets/icons/feature3.png" alt="Results icon" class="card-icon" />
-              </span>
-              <h3 class="text-base font-semibold uppercase tracking-[0.14em]">Trend-Driven Marketing</h3>
-            </div>
-            <div class="card-divider"></div>
-            <p class="why-copy text-sm text-zinc-300">We stay updated with the latest digital trends to keep your brand relevant and competitive.</p>
-          </article>
-          <article class="why-card reveal gradient-border-min rounded-2xl p-6 glow-hover">
-            <div class="card-head">
-              <span class="icon-shell">
-                <img src="assets/icons/feature4.png" alt="Support icon" class="card-icon" />
-              </span>
-              <h3 class="text-base font-semibold uppercase tracking-[0.14em]">Results-Focused Solutions</h3>
-            </div>
-            <div class="card-divider"></div>
-            <p class="why-copy text-sm text-zinc-300">Our strategies aim to increase engagement, brand awareness, and business growth.</p>
-          </article>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <article class="portfolio-tile reveal rounded-2xl p-4"><div class="portfolio-media h-72"><img src="assets/images/portfolio/01.png" alt="" class="portfolio-img" onerror="this.remove()" /></div></article>
+          <article class="portfolio-tile reveal rounded-2xl p-4"><div class="portfolio-media h-72"><img src="assets/images/portfolio/06.png" alt="" class="portfolio-img" onerror="this.remove()" /></div></article>
+        </div>
+        <div class="mt-8 text-center">
+          <a href="portfolio.html" class="inline-flex rounded-full border border-yellow-300/35 px-6 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gold transition hover:shadow-neon">See Full Portfolio</a>
         </div>
       </section>
 
-      <section id="portfolio" class="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
-        <div class="reveal mb-12 text-center">
-          <h2 class="text-3xl font-bold uppercase tracking-[0.22em] md:text-4xl">Portfolio</h2>
-          <p class="mx-auto mt-5 max-w-2xl text-zinc-300">Sample mockups from Creative Parrot</p>
-        </div>
-        <!-- Images: first line inside each .portfolio-media — class="portfolio-img" fills the cell -->
-        <div class="bento-grid">
-          <article class="portfolio-tile bento-a reveal rounded-2xl p-4">
-            <div class="portfolio-media h-full">
-              <img src="assets/images/portfolio/01.png" alt="" class="portfolio-img" onerror="this.remove()" />
-              <span class="portfolio-dim-label">1920×855</span>
-            </div>
-          </article>
-          <article class="portfolio-tile bento-b reveal rounded-2xl p-4">
-            <div class="portfolio-media h-full">
-              <img src="assets/images/portfolio/07.png" alt="" class="portfolio-img" onerror="this.remove()" />
-              <span class="portfolio-dim-label">1920×845</span>
-            </div>
-          </article>
-          <article class="portfolio-tile bento-c reveal rounded-2xl p-4">
-            <div class="portfolio-media h-full">
-              <img src="assets/images/portfolio/08.png" alt="" class="portfolio-img" onerror="this.remove()" />
-              <span class="portfolio-dim-label">1920×845</span>
-            </div>
-          </article>
-          <article class="portfolio-tile bento-d reveal rounded-2xl p-4">
-            <div class="portfolio-media h-full">
-              <img src="assets/images/portfolio/04.png" alt="" class="portfolio-img" onerror="this.remove()" />
-              <span class="portfolio-dim-label">1920×1140</span>
-            </div>
-          </article>
-          <article class="portfolio-tile bento-e reveal rounded-2xl p-4">
-            <div class="portfolio-media h-full">
-              <img src="assets/images/portfolio/05.png" alt="" class="portfolio-img" onerror="this.remove()" />
-              <span class="portfolio-dim-label">1920×1140</span>
-            </div>
-          </article>
-          <article class="portfolio-tile bento-f reveal rounded-2xl p-4">
-            <div class="portfolio-media h-full">
-              <img src="assets/images/portfolio/06.png" alt="" class="portfolio-img" onerror="this.remove()" />
-              <span class="portfolio-dim-label">1920×1298</span>
-            </div>
-          </article>
-          <article class="portfolio-tile bento-g reveal rounded-2xl p-4">
-            <div class="portfolio-media h-full">
-              <img src="assets/images/portfolio/02.png" alt="" class="portfolio-img" onerror="this.remove()" />
-              <span class="portfolio-dim-label">1920×1920</span>
-            </div>
-          </article>
-          <article class="portfolio-tile bento-h reveal rounded-2xl p-4">
-            <div class="portfolio-media h-full">
-              <img src="assets/images/portfolio/03.png" alt="" class="portfolio-img" onerror="this.remove()" />
-              <span class="portfolio-dim-label">1920×1920</span>
-            </div>
-          </article>
-        </div>
-      </section>
-
-      <!-- Bonus: Blog -->
-<section id="blog" class="mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-24">
-  <div class="reveal mb-12 text-center">
-    <h2 class="text-3xl font-bold uppercase tracking-[0.22em] md:text-4xl">Blog</h2>
-    <p class="mx-auto mt-5 max-w-2xl text-zinc-300">
-      Insights, stats, and strategies from Creative Parrot.
-    </p>
-  </div>
-
-  <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-
-    <!-- POST 1 -->
-    <article class="reveal gradient-border-min rounded-2xl p-6 glow-hover">
-      <!-- IMAGE PLACEHOLDER -->
-      <div class="h-40 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-500 text-sm">
-        <img src="assets\blogs\1.jpg" class="h-40 w-full object-cover rounded-xl" />
-      </div>
-
-      <h3 class="mt-5 text-base font-semibold uppercase tracking-[0.14em]">
-        97% Trust Social Media
-      </h3>
-
-      <p class="mt-3 text-sm text-zinc-300">
-        97% of consumers turn to social media for product recommendations. 
-        Your online presence matters more than ever.
-      </p>
-
-      <div class="mt-5">
-        <a href="https://www.facebook.com/share/p/1Gh4kMA2NF/" target="_blank"
-          class="inline-flex rounded-full border border-yellow-300/35 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gold hover:shadow-neon transition">
-          View Post
-        </a>
-      </div>
-    </article>
-
-    <!-- POST 2 -->
-    <article class="reveal gradient-border-min rounded-2xl p-6 glow-hover" style="transition-delay: 60ms;">
-      <!-- IMAGE PLACEHOLDER -->
-      <div class="h-40 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-500 text-sm">
-        <img src="assets\blogs\2.jpg" class="h-40 w-full object-cover rounded-xl" />
-      </div>
-
-      <h3 class="mt-5 text-base font-semibold uppercase tracking-[0.14em]">
-        Did You Know?
-      </h3>
-
-      <p class="mt-3 text-sm text-zinc-300">
-        Effective social media management can increase brand awareness 
-        by up to 70%. Strategy + consistency = growth.
-      </p>
-
-      <div class="mt-5">
-        <a href="https://www.facebook.com/share/p/1KpFbY4cpn/" target="_blank"
-          class="inline-flex rounded-full border border-yellow-300/35 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gold hover:shadow-neon transition">
-          View Post
-        </a>
-      </div>
-    </article>
-
-    <!-- POST 3 -->
-    <article class="reveal gradient-border-min rounded-2xl p-6 glow-hover" style="transition-delay: 60ms;">
-      <!-- IMAGE PLACEHOLDER -->
-      <div class="h-40 rounded-xl bg-zinc-800 flex items-center justify-center text-zinc-500 text-sm">
-        <img src="assets\blogs\3.jpg" class="h-40 w-full object-cover rounded-xl" />
-      </div>
-
-      <h3 class="mt-5 text-base font-semibold uppercase tracking-[0.14em]">
-        Be Productive Now!
-      </h3>
-
-      <p class="mt-3 text-sm text-zinc-300">
-        5 Business Coaching Tips for Productivity at Work
-      </p>
-
-      <div class="mt-5">
-        <a href="https://www.facebook.com/share/p/1DzLYuXoAG/" target="_blank"
-          class="inline-flex rounded-full border border-yellow-300/35 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gold hover:shadow-neon transition">
-          View Post
-        </a>
-      </div>
-    </article>
-
-  </div>
-</section>
-<section id="contact" class="px-5 py-16 md:px-8 md:py-24">
-  <div class="mx-auto max-w-7xl rounded-3xl bg-gradient-to-r from-yellow-300 via-orange-400 to-red-500 p-[1px] shadow-soft-red">
-    <div class="rounded-3xl bg-black/90 p-6 md:p-10">
-      <div class="reveal text-center">
-        <h2 class="text-3xl font-bold uppercase tracking-[0.2em] text-white md:text-4xl">CONTACT</h2>
-        <p class="mx-auto mt-4 max-w-2xl text-zinc-200">
-          Tell us about your idea and we will turn it into a premium digital story.
-        </p>
-        <p class="mt-3 text-sm text-zinc-300">
-          Email:
-          <a href="mailto:yourcreativeparrotintern@gmail.com" class="text-gold underline-offset-4 hover:underline">
-            yourcreativeparrotintern@gmail.com
-          </a>
-        </p>
-      </div>
-
-      <form id="contact-form" class="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <div class="reveal space-y-4">
-          <input
-            name="name"
-            type="text"
-            required
-            placeholder="Name"
-            class="input-ring w-full rounded-xl border border-yellow-300/45 bg-zinc-950 px-4 py-3 text-zinc-200 outline-none transition duration-300 placeholder:text-zinc-500"
-          />
-          <input
-            name="email"
-            type="email"
-            required
-            placeholder="Email"
-            class="input-ring w-full rounded-xl border border-yellow-300/45 bg-zinc-950 px-4 py-3 text-zinc-200 outline-none transition duration-300 placeholder:text-zinc-500"
-          />
-
-          <div class="mt-2 flex w-full items-center justify-center gap-5">
-            <a href="https://www.facebook.com/yourcreative.parrot" aria-label="Facebook" class="contact-social-link">
-              <img src="assets/icons/facebook.png" alt="" class="contact-social-icon" />
-            </a>
-            <a href="#" aria-label="Instagram" class="contact-social-link">
-              <img src="assets/icons/instagram.png" alt="" class="contact-social-icon" />
-            </a>
-            <a href="#" aria-label="X" class="contact-social-link">
-              <img src="assets/icons/x.png" alt="" class="contact-social-icon" />
-            </a>
-            <a href="#" aria-label="LinkedIn" class="contact-social-link">
-              <img src="assets/icons/linkedin.png" alt="" class="contact-social-icon" />
-            </a>
+      <section class="px-5 py-16 md:px-8 md:py-20">
+        <div class="mx-auto max-w-6xl rounded-3xl bg-gradient-to-r from-yellow-300 via-orange-400 to-red-500 p-[1px] shadow-soft-red reveal">
+          <div class="rounded-3xl bg-black/90 px-8 py-12 text-center">
+            <h2 class="text-3xl font-bold uppercase tracking-[0.2em] md:text-4xl">Ready to Grow?</h2>
+            <p class="mx-auto mt-5 max-w-2xl text-zinc-300">Let us turn your next idea into a premium digital experience.</p>
+            <a href="contact.html" class="mt-8 inline-flex rounded-full bg-gold px-8 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-black transition duration-300 hover:scale-105 hover:shadow-[0_0_26px_rgba(250,204,21,0.55)]">Start a Project</a>
           </div>
         </div>
-
-        <div class="reveal">
-          <textarea
-            name="message"
-            required
-            placeholder="Message"
-            rows="8"
-            class="input-ring min-h-[230px] w-full rounded-2xl border border-yellow-300/45 bg-zinc-950 px-4 py-3 text-zinc-200 outline-none transition duration-300 placeholder:text-zinc-500"
-          ></textarea>
-          <button
-            type="submit"
-            class="mt-6 mx-auto flex w-fit rounded-full bg-gold px-8 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-black shadow-[0_0_0_rgba(0,0,0,0)] transition duration-300 hover:scale-105 hover:shadow-[0_0_26px_rgba(250,204,21,0.55)]"
-          >
-            Submit
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</section>
+      </section>
+    </main>
 
     <footer class="border-t border-zinc-800 px-5 py-6 md:px-8">
       <div class="mx-auto flex max-w-7xl flex-col items-start justify-between gap-2 text-sm text-zinc-400 sm:flex-row sm:items-center">
@@ -1072,14 +162,16 @@
       </div>
     </footer>
 
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-<script type="text/javascript">
-  (function() {
-    // Replace "YOUR_PUBLIC_KEY" with the one from your EmailJS Account
-    emailjs.init("0NQvvVbUYvQUtxeB2"); 
-  })();
-</script>
+    <button id="chat-launcher" type="button" aria-label="Open chat" class="inline-flex h-12 w-12 items-center justify-center rounded-full text-lg">💬</button>
+    <aside id="chat-modal" class="rounded-2xl p-4">
+      <div class="mb-3 flex items-center justify-between"><p class="text-sm font-semibold uppercase tracking-[0.14em] text-gold">Creative Parrot Chat</p><button id="chat-close" type="button" class="rounded-md px-2 py-1 text-xs text-zinc-300 hover:text-gold">Close</button></div>
+      <div id="chat-messages" class="space-y-3 pr-1 text-sm"></div>
+      <form id="chat-form" class="mt-3 flex items-center gap-2">
+        <input id="chat-input" type="text" placeholder="Type your message..." class="input-ring w-full rounded-xl border border-yellow-300/45 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 outline-none placeholder:text-zinc-500" />
+        <button type="submit" class="rounded-xl bg-gold px-3 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-black">Send</button>
+      </form>
+    </aside>
+
     <script src="script.js"></script>
-    
   </body>
 </html>
