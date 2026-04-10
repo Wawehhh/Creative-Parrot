@@ -35,7 +35,7 @@
   <script src="script.js"></script>
   <script>
     (function () {
-      const CHAT_STORAGE_KEY = "cp-chat-conversations";
+      const API_BASE = "./api";
       const listEl = document.getElementById("conversation-list");
       const viewEl = document.getElementById("message-view");
       const activeClientLabel = document.getElementById("active-client-id");
@@ -47,40 +47,224 @@
       const clearChatButton = document.getElementById("clear-chat");
       const replyForm = document.getElementById("admin-reply-form");
       const replyInput = document.getElementById("admin-reply-input");
+      
       let selectedClientId = null;
+      let conversationData = {};
+      
       const formatDate = (ts) => new Date(ts).toLocaleString([], { month: "short", day: "2-digit", hour: "2-digit", minute: "2-digit" });
-      const getStore = () => { try { return JSON.parse(localStorage.getItem(CHAT_STORAGE_KEY) || "{}"); } catch { return {}; } };
-      const saveStore = (store) => localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(store));
-      const normalize = (entry) => Array.isArray(entry) ? { status: "pending", messages: entry, updatedAt: entry[entry.length - 1]?.timestamp || Date.now() } : { status: entry?.status || "pending", messages: Array.isArray(entry?.messages) ? entry.messages : [], updatedAt: entry?.updatedAt || Date.now() };
-      const statusClass = (s) => s === "active" ? "border-emerald-300/60 text-emerald-300 bg-emerald-500/10" : s === "closed" ? "border-red-300/60 text-red-300 bg-red-500/10" : "border-yellow-300/60 text-yellow-300 bg-yellow-500/10";
-      const appendMessage = (store, clientId, text, who) => { const now = Date.now(); const rec = normalize(store[clientId]); rec.messages.push({ id: `${now}-${Math.random().toString(36).slice(2, 7)}`, text, who, timestamp: now }); rec.updatedAt = now; store[clientId] = rec; };
+      
+      const statusClass = (s) => 
+        s === "active" ? "border-emerald-300/60 text-emerald-300 bg-emerald-500/10" : 
+        s === "closed" ? "border-red-300/60 text-red-300 bg-red-500/10" : 
+        "border-yellow-300/60 text-yellow-300 bg-yellow-500/10";
+      
+      const loadConversations = async () => {
+        try {
+          const res = await fetch(`${API_BASE}/admin-get.php`);
+          const data = await res.json();
+          
+          if (!data.success) {
+            console.error("Failed to load conversations:", data.error);
+            return;
+          }
+          
+          conversationData = data.conversations || {};
+          renderList();
+        } catch (e) {
+          console.error("Load conversations error:", e);
+        }
+      };
+      
       const renderMessages = (clientId) => {
-        const store = getStore(); const rec = clientId ? normalize(store[clientId]) : null; const status = rec?.status || null;
+        const rec = clientId ? conversationData[clientId] : null;
+        const status = rec?.status || null;
+        
         activeClientLabel.textContent = clientId ? `Client ID: ${clientId}` : "Select a client";
         activeStatusBadge.textContent = status || "-";
         activeStatusBadge.className = `inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${status ? statusClass(status) : "border-zinc-600 text-zinc-300"}`;
+        
         acceptButton.classList.toggle("hidden", status !== "pending");
-        const closed = status === "closed"; replyInput.disabled = !clientId || closed; replyForm.querySelector('button[type="submit"]').disabled = !clientId || closed;
+        
+        const closed = status === "closed";
+        replyInput.disabled = !clientId || closed;
+        replyForm.querySelector('button[type="submit"]').disabled = !clientId || closed;
+        
         viewEl.innerHTML = "";
-        if (!clientId) { viewEl.innerHTML = '<p class="text-sm text-zinc-400">Select a client from the left panel.</p>'; return; }
-        (rec.messages || []).forEach((msg) => { const item = document.createElement("article"); item.className = `chat-bubble ${msg.who === "client" ? "user" : "bot"}`; item.innerHTML = `<p class="text-sm"></p><p class="mt-1 text-[10px] uppercase tracking-[0.12em] text-zinc-400"></p>`; item.children[0].textContent = msg.text || ""; item.children[1].textContent = `${msg.who || "system"} • ${formatDate(msg.timestamp)}`; viewEl.appendChild(item); });
-        if ((rec.messages || []).length === 0) viewEl.innerHTML = '<p class="text-sm text-zinc-400">No messages yet.</p>';
+        
+        if (!clientId) {
+          viewEl.innerHTML = '<p class="text-sm text-zinc-400">Select a client from the left panel.</p>';
+          return;
+        }
+        
+        (rec?.messages || []).forEach((msg) => {
+          const item = document.createElement("article");
+          item.className = `chat-bubble ${msg.who === "client" || msg.who === "user" ? "user" : "bot"}`;
+          item.innerHTML = `<p class="text-sm"></p><p class="mt-1 text-[10px] uppercase tracking-[0.12em] text-zinc-400"></p>`;
+          item.children[0].textContent = msg.text || "";
+          item.children[1].textContent = `${msg.who || "system"} • ${formatDate(msg.timestamp)}`;
+          viewEl.appendChild(item);
+        });
+        
+        if ((rec?.messages || []).length === 0) {
+          viewEl.innerHTML = '<p class="text-sm text-zinc-400">No messages yet.</p>';
+        }
       };
+      
       const renderList = () => {
-        const store = getStore(); const items = Object.keys(store).map((id) => ({ id, rec: normalize(store[id]) })).sort((a, b) => (b.rec.updatedAt || 0) - (a.rec.updatedAt || 0));
-        listEl.innerHTML = ""; if (items.length === 0) { listEl.innerHTML = '<p class="text-sm text-zinc-400">No conversations yet.</p>'; selectedClientId = null; renderMessages(null); return; }
-        items.forEach(({ id, rec }) => { const btn = document.createElement("button"); btn.className = `w-full rounded-xl border px-3 py-3 text-left transition ${selectedClientId === id ? "border-yellow-300/60 bg-yellow-300/10" : "border-zinc-700/80 bg-zinc-900/50 hover:border-yellow-300/40"}`; btn.innerHTML = `<div class="flex items-center justify-between gap-2"><p class="truncate text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200">${id}</p><span class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${statusClass(rec.status)}">${rec.status}</span></div><p class="mt-1 text-xs text-zinc-400">${rec.messages.length} message(s)</p>`; btn.addEventListener("click", () => { selectedClientId = id; renderList(); renderMessages(id); }); listEl.appendChild(btn); });
-        if (!selectedClientId || !store[selectedClientId]) selectedClientId = items[0].id; renderMessages(selectedClientId);
+        const items = Object.keys(conversationData)
+          .map((id) => ({ id, rec: conversationData[id] }))
+          .sort((a, b) => (b.rec.updatedAt || 0) - (a.rec.updatedAt || 0));
+        
+        listEl.innerHTML = "";
+        
+        if (items.length === 0) {
+          listEl.innerHTML = '<p class="text-sm text-zinc-400">No conversations yet.</p>';
+          selectedClientId = null;
+          renderMessages(null);
+          return;
+        }
+        
+        items.forEach(({ id, rec }) => {
+          const btn = document.createElement("button");
+          btn.className = `w-full rounded-xl border px-3 py-3 text-left transition ${
+            selectedClientId === id 
+              ? "border-yellow-300/60 bg-yellow-300/10" 
+              : "border-zinc-700/80 bg-zinc-900/50 hover:border-yellow-300/40"
+          }`;
+          btn.innerHTML = `
+            <div class="flex items-center justify-between gap-2">
+              <p class="truncate text-xs font-semibold uppercase tracking-[0.12em] text-zinc-200">${id}</p>
+              <span class="inline-flex rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] ${statusClass(rec.status)}">${rec.status}</span>
+            </div>
+            <p class="mt-1 text-xs text-zinc-400">${rec.messages?.length || 0} message(s)</p>
+          `;
+          btn.addEventListener("click", () => {
+            selectedClientId = id;
+            renderList();
+            renderMessages(id);
+          });
+          listEl.appendChild(btn);
+        });
+        
+        if (!selectedClientId || !conversationData[selectedClientId]) {
+          selectedClientId = items[0]?.id || null;
+        }
+        renderMessages(selectedClientId);
       };
-      const mutate = (fn) => { if (!selectedClientId) return; const store = getStore(); const rec = normalize(store[selectedClientId]); fn(store, rec); saveStore(store); renderList(); };
-      acceptButton.addEventListener("click", () => mutate((store, rec) => { if (rec.status !== "pending") return; rec.status = "active"; store[selectedClientId] = rec; appendMessage(store, selectedClientId, "Admin joined the chat.", "admin"); }));
-      closeButton.addEventListener("click", () => mutate((store, rec) => { if (rec.status === "closed") return; rec.status = "closed"; store[selectedClientId] = rec; appendMessage(store, selectedClientId, "Admin ended the chat.", "admin"); }));
-      clearChatButton.addEventListener("click", () => { if (!selectedClientId) return; if (!window.confirm("Delete this chat conversation permanently?")) return; const store = getStore(); delete store[selectedClientId]; saveStore(store); selectedClientId = null; renderList(); });
-      replyForm.addEventListener("submit", (e) => { e.preventDefault(); const text = (replyInput.value || "").trim(); if (!text || !selectedClientId) return; mutate((store, rec) => { if (rec.status === "closed") return; if (rec.status === "pending") { rec.status = "active"; store[selectedClientId] = rec; appendMessage(store, selectedClientId, "Admin joined the chat.", "admin"); } appendMessage(store, selectedClientId, text, "admin"); }); replyInput.value = ""; });
-      refreshButton.addEventListener("click", renderList);
-      clearAllButton.addEventListener("click", () => { if (!window.confirm("Delete all chat conversations from localStorage?")) return; localStorage.removeItem(CHAT_STORAGE_KEY); selectedClientId = null; renderList(); });
-      window.addEventListener("storage", (event) => { if (event.key === CHAT_STORAGE_KEY) renderList(); });
-      renderList();
+      
+      acceptButton.addEventListener("click", async () => {
+        if (!selectedClientId) return;
+        
+        try {
+          const res = await fetch(`${API_BASE}/chat-status.php`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ clientId: selectedClientId, status: "active" })
+          });
+          
+          const data = await res.json();
+          if (data.success) {
+            await loadConversations();
+          } else {
+            console.error("Failed to accept chat:", data.error);
+            alert("Failed to accept chat: " + (data.error || "Unknown error"));
+          }
+        } catch (e) {
+          console.error("Accept chat error:", e);
+          alert("Network error: " + e.message);
+        }
+      });
+      
+      closeButton.addEventListener("click", async () => {
+        if (!selectedClientId) return;
+        
+        try {
+          const res = await fetch(`${API_BASE}/chat-status.php`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ clientId: selectedClientId, status: "closed" })
+          });
+          
+          const data = await res.json();
+          if (data.success) {
+            await loadConversations();
+          } else {
+            console.error("Failed to close chat:", data.error);
+            alert("Failed to close chat: " + (data.error || "Unknown error"));
+          }
+        } catch (e) {
+          console.error("Close chat error:", e);
+          alert("Network error: " + e.message);
+        }
+      });
+      
+      clearChatButton.addEventListener("click", async () => {
+        if (!selectedClientId) return;
+        if (!window.confirm("Delete this chat conversation permanently?")) return;
+        
+        try {
+          // For now, just close the chat and clear locally
+          // In a production app, you'd want a delete endpoint
+          const res = await fetch(`${API_BASE}/chat-status.php`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ clientId: selectedClientId, status: "closed" })
+          });
+          
+          if (res.ok) {
+            const clientToDelete = selectedClientId;
+            delete conversationData[clientToDelete];
+            selectedClientId = null;
+            renderList();
+          }
+        } catch (e) {
+          console.error("Clear chat error:", e);
+          alert("Network error: " + e.message);
+        }
+      });
+      
+      replyForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const text = (replyInput.value || "").trim();
+        
+        if (!text || !selectedClientId) {
+          console.warn("Empty message or no client selected");
+          return;
+        }
+        
+        try {
+          const res = await fetch(`${API_BASE}/admin-send.php`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ clientId: selectedClientId, message: text, timestamp: Date.now() })
+          });
+          
+          const data = await res.json();
+          if (data.success) {
+            replyInput.value = "";
+            replyInput.focus();
+            await loadConversations();
+          } else {
+            console.error("Failed to send reply:", data.error);
+            alert("Failed to send message: " + (data.error || "Unknown error"));
+          }
+        } catch (e) {
+          console.error("Send reply error:", e);
+          alert("Network error: " + e.message);
+        }
+      });
+      
+      refreshButton.addEventListener("click", loadConversations);
+      
+      clearAllButton.addEventListener("click", () => {
+        alert("Clear all conversations feature not yet implemented. Use the clear chat button for individual conversations.");
+      });
+      
+      // Initial load
+      loadConversations();
+      
+      // Poll for new messages every 2 seconds
+      window.setInterval(loadConversations, 2000);
     })();
   </script>
 </body>

@@ -21,7 +21,7 @@ const chatMessages = document.getElementById("chat-messages");
 const chatForm = document.getElementById("chat-form");
 const chatInput = document.getElementById("chat-input");
 const CHAT_CLIENT_ID_KEY = "cp-chat-client-id";
-const CHAT_STORAGE_KEY = "cp-chat-conversations";
+const API_BASE = "./api";
 
 function trackEvent(eventName, params) {
   const safeParams = params || {};
@@ -43,24 +43,48 @@ function applyTheme(theme) {
   const root = document.documentElement;
   const resolvedTheme = theme === "light" ? "light" : "dark";
   root.setAttribute("data-theme", resolvedTheme);
-  localStorage.setItem("cp-theme", resolvedTheme);
 
   if (themeIcon && themeToggle) {
     const isLight = resolvedTheme === "light";
     themeIcon.textContent = isLight ? "🌙" : "☀";
     themeToggle.setAttribute("aria-label", isLight ? "Switch to dark mode" : "Switch to light mode");
   }
+
+  // Save theme to database
+  const clientId = localStorage.getItem(CHAT_CLIENT_ID_KEY);
+  if (clientId) {
+    fetch(`${API_BASE}/theme-save.php`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ clientId, theme: resolvedTheme })
+    }).catch(e => console.error("Theme save error:", e));
+  }
 }
 
 function initTheme() {
-  const savedTheme = localStorage.getItem("cp-theme");
-  if (savedTheme === "light" || savedTheme === "dark") {
-    applyTheme(savedTheme);
-    return;
+  // Create client ID if not exists
+  let clientId = localStorage.getItem(CHAT_CLIENT_ID_KEY);
+  if (!clientId) {
+    clientId = `client-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    localStorage.setItem(CHAT_CLIENT_ID_KEY, clientId);
   }
 
-  const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
-  applyTheme(prefersLight ? "light" : "dark");
+  // Load theme from database
+  fetch(`${API_BASE}/theme-get.php?clientId=${clientId}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.theme) {
+        applyTheme(data.theme);
+      } else {
+        const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+        applyTheme(prefersLight ? "light" : "dark");
+      }
+    })
+    .catch(e => {
+      console.error("Theme load error:", e);
+      const prefersLight = window.matchMedia("(prefers-color-scheme: light)").matches;
+      applyTheme(prefersLight ? "light" : "dark");
+    });
 }
 
 function toggleTheme() {
@@ -201,7 +225,6 @@ function iconHoverBounce() {
     });
   });
 }
-// Initialize EmailJS with your public key
 
 function setupContactForm() {
   if (!contactForm) return;
@@ -218,14 +241,12 @@ function setupContactForm() {
       submitButton.disabled = true;
     }
 
-    // These names must match the "name" attribute in your HTML inputs
     const formData = {
       name: contactForm.name.value,
       email: contactForm.email.value,
       message: contactForm.message.value
     };
 
-    // Replace these strings with your ACTUAL IDs from EmailJS dashboard
     emailjs.send("service_acxhgoi", "template_65zalmw", formData)
       .then(() => {
         if (submitButton) submitButton.textContent = "Sent!";
@@ -285,78 +306,8 @@ function setupLeadForm() {
 function setupChatWidget() {
   if (!chatLauncher || !chatModal || !chatClose || !chatForm || !chatInput) return;
 
-  const createClientId = () => `client-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   let lastKnownStatus = null;
-
-  const getChatStore = () => {
-    try {
-      const raw = localStorage.getItem(CHAT_STORAGE_KEY);
-      if (!raw) return {};
-      const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? parsed : {};
-    } catch (e) {
-      return {};
-    }
-  };
-
-  const saveChatStore = (store) => {
-    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(store));
-  };
-
-  const getClientId = () => localStorage.getItem(CHAT_CLIENT_ID_KEY);
-
-  const setClientId = (id) => {
-    localStorage.setItem(CHAT_CLIENT_ID_KEY, id);
-  };
-
-  const clearClientId = () => {
-    localStorage.removeItem(CHAT_CLIENT_ID_KEY);
-  };
-
-  const ensureClientRecord = (clientId) => {
-    const store = getChatStore();
-    const current = store[clientId];
-    if (Array.isArray(current)) {
-      store[clientId] = {
-        status: "pending",
-        messages: current,
-        createdAt: current[0]?.timestamp || Date.now(),
-        updatedAt: current[current.length - 1]?.timestamp || Date.now()
-      };
-    } else if (!current || typeof current !== "object") {
-      store[clientId] = {
-        status: "pending",
-        messages: [],
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-      };
-    } else {
-      store[clientId].messages = Array.isArray(store[clientId].messages) ? store[clientId].messages : [];
-      store[clientId].status = store[clientId].status || "pending";
-      store[clientId].createdAt = store[clientId].createdAt || Date.now();
-      store[clientId].updatedAt = store[clientId].updatedAt || Date.now();
-    }
-    return { store, record: store[clientId] };
-  };
-
-  const updateStatus = (clientId, status) => {
-    const { store, record } = ensureClientRecord(clientId);
-    record.status = status;
-    record.updatedAt = Date.now();
-    saveChatStore(store);
-  };
-
-  const addMessageToStore = (clientId, text, who, timestamp = Date.now()) => {
-    const { store, record } = ensureClientRecord(clientId);
-    record.messages.push({
-      id: `${timestamp}-${Math.random().toString(36).slice(2, 7)}`,
-      text,
-      who,
-      timestamp
-    });
-    record.updatedAt = timestamp;
-    saveChatStore(store);
-  };
+  const clientId = localStorage.getItem(CHAT_CLIENT_ID_KEY);
 
   const formatTime = (timestamp) =>
     new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -418,21 +369,18 @@ function setupChatWidget() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
   };
 
-  const renderConversation = (clientId) => {
-    if (!clientId) {
+  const renderConversation = (convData) => {
+    if (!convData) {
       chatMessages.innerHTML = "";
+      safeAddBubble("Hi! Tell us what you're building today.", "admin", Date.now());
       setStatusBadge("pending");
       setInputAvailability("pending");
       lastKnownStatus = "pending";
       return;
     }
-    const store = getChatStore();
-    const record = store[clientId];
-    const normalized = Array.isArray(record)
-      ? { status: "pending", messages: record }
-      : (record || { status: "pending", messages: [] });
-    const messages = Array.isArray(normalized.messages) ? normalized.messages : [];
-    const status = normalized.status || "pending";
+
+    const messages = convData.messages || [];
+    const status = convData.status || "pending";
 
     chatMessages.innerHTML = "";
     messages.forEach((msg) => safeAddBubble(msg.text, msg.who, msg.timestamp));
@@ -449,18 +397,33 @@ function setupChatWidget() {
     }
   };
 
-  const openChat = () => {
-    chatModal.classList.add("open");
-    let clientId = getClientId();
-    if (!clientId) {
-      chatMessages.innerHTML = "";
-      safeAddBubble("Hi! Tell us what you’re building today.", "admin", Date.now());
-      setStatusBadge("pending");
-      setInputAvailability("pending");
-      lastKnownStatus = "pending";
+  const loadConversation = async () => {
+    const currentClientId = localStorage.getItem(CHAT_CLIENT_ID_KEY);
+    if (!currentClientId) {
+      renderConversation(null);
       return;
     }
-    renderConversation(clientId);
+
+    try {
+      const res = await fetch(`${API_BASE}/chat-get.php?clientId=${currentClientId}`);
+      const data = await res.json();
+      if (data.success && data.conversations[currentClientId]) {
+        renderConversation(data.conversations[currentClientId]);
+      } else if (!data.success) {
+        console.error("Load conversation API error:", data);
+        renderConversation(null);
+      } else {
+        renderConversation(null);
+      }
+    } catch (e) {
+      console.error("Load conversation error:", e);
+      renderConversation(null);
+    }
+  };
+
+  const openChat = () => {
+    chatModal.classList.add("open");
+    loadConversation();
   };
 
   const closeChat = () => {
@@ -470,90 +433,86 @@ function setupChatWidget() {
   chatLauncher.addEventListener("click", openChat);
   chatClose.addEventListener("click", closeChat);
 
-  chatForm.addEventListener("submit", (event) => {
+  chatForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     const value = (chatInput.value || "").trim();
-    if (!value) return;
-
-    let clientId = getClientId();
-    if (!clientId) {
-      clientId = createClientId();
-      setClientId(clientId);
-      const firstTs = Date.now();
-      addMessageToStore(clientId, "Hi! Tell us what you’re building today.", "admin", firstTs);
-      updateStatus(clientId, "pending");
+    if (!value) {
+      console.warn("Chat: Empty message");
+      return;
     }
-
-    const store = getChatStore();
-    const record = store[clientId];
-    const status = Array.isArray(record) ? "pending" : (record?.status || "pending");
-    if (status === "closed") {
-      setInputAvailability("closed");
+    
+    let currentClientId = localStorage.getItem(CHAT_CLIENT_ID_KEY);
+    if (!currentClientId) {
+      console.error("Chat: No clientId found in localStorage");
+      alert("Chat not initialized. Please refresh the page.");
       return;
     }
 
-    const userTs = Date.now();
-    safeAddBubble(value, "client", userTs);
-    addMessageToStore(clientId, value, "client", userTs);
+    try {
+      const res = await fetch(`${API_BASE}/chat-send.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientId: currentClientId, message: value, sender: "client", timestamp: Date.now() })
+      });
 
-    const refreshed = getChatStore();
-    const refreshedRecord = refreshed[clientId];
-    const messageCount = Array.isArray(refreshedRecord)
-      ? refreshedRecord.length
-      : (refreshedRecord?.messages?.length || 0);
-    if (messageCount === 2) {
-      updateStatus(clientId, "pending");
-      addMessageToStore(clientId, "Waiting for admin to accept your chat...", "admin", Date.now());
+      const data = await res.json();
+      if (data.success) {
+        chatInput.value = "";
+        chatInput.focus();
+        trackEvent("chat_message", { source: "widget", client_id: currentClientId });
+        loadConversation();
+      } else {
+        console.error("Chat send failed:", data);
+        alert("Failed to send message: " + (data.error || "Unknown error"));
+      }
+    } catch (e) {
+      console.error("Send message error:", e);
+      alert("Network error: " + e.message);
     }
-
-    chatInput.value = "";
-    chatInput.focus();
-
-    trackEvent("chat_message", { source: "widget", client_id: clientId });
-    renderConversation(clientId);
   });
 
-  endChatButton.addEventListener("click", () => {
-    const clientId = getClientId();
+  endChatButton.addEventListener("click", async () => {
     if (!clientId) {
-      chatMessages.innerHTML = "";
-      safeAddBubble("Hi! Tell us what you’re building today.", "admin", Date.now());
-      setStatusBadge("pending");
-      setInputAvailability("pending");
+      renderConversation(null);
       return;
     }
-    const store = getChatStore();
-    const record = store[clientId];
-    const status = Array.isArray(record) ? "pending" : (record?.status || "pending");
-    if (status === "closed") {
-      clearClientId();
-      chatMessages.innerHTML = "";
-      safeAddBubble("Hi! Tell us what you’re building today.", "admin", Date.now());
-      setStatusBadge("pending");
-      setInputAvailability("pending");
-      lastKnownStatus = "pending";
-      return;
+
+    try {
+      const newStatus = lastKnownStatus === "closed" ? "pending" : "closed";
+      const res = await fetch(`${API_BASE}/chat-status.php`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientId, status: newStatus })
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        if (newStatus === "pending") {
+          renderConversation(null);
+        } else {
+          await fetch(`${API_BASE}/chat-send.php`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ clientId, message: "Client ended the chat.", sender: "client", timestamp: Date.now() })
+          });
+          loadConversation();
+        }
+      }
+    } catch (e) {
+      console.error("Update status error:", e);
     }
-    updateStatus(clientId, "closed");
-    addMessageToStore(clientId, "Client ended the chat.", "client", Date.now());
-    renderConversation(clientId);
   });
 
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeChat();
   });
 
-  window.addEventListener("storage", (event) => {
-    if (event.key !== CHAT_STORAGE_KEY) return;
-    const clientId = getClientId();
-    if (!clientId || !chatModal.classList.contains("open")) return;
-    renderConversation(clientId);
-  });
-
+  // Poll for updates every 1.5 seconds
   window.setInterval(() => {
-    const clientId = getClientId();
-    if (!clientId || !chatModal.classList.contains("open")) return;
-    renderConversation(clientId);
+    const currentClientId = localStorage.getItem(CHAT_CLIENT_ID_KEY);
+    if (currentClientId && chatModal.classList.contains("open")) {
+      loadConversation();
+    }
   }, 1500);
 }
 
@@ -562,7 +521,6 @@ window.addEventListener("scroll", handleNavbarScroll);
 if (menuBtn) menuBtn.addEventListener("click", toggleMobileMenu);
 mobileLinks.forEach((link) => link.addEventListener("click", closeMobileMenu));
 if (themeToggle) themeToggle.addEventListener("click", toggleTheme);
-
 
 initTheme();
 setupLinkUnderline();
