@@ -10,8 +10,8 @@ if (!$clientId) {
 }
 
 try {
-    // Get the latest conversation for this client
-    $stmt = $pdo->prepare('SELECT id, status, created_at, updated_at FROM chat_conversations WHERE client_id = ? ORDER BY updated_at DESC LIMIT 1');
+    // Get the latest ACTIVE or PENDING conversation for this client (skip closed)
+    $stmt = $pdo->prepare('SELECT id, status, created_at, updated_at FROM chat_conversations WHERE client_id = ? AND status != "closed" ORDER BY updated_at DESC LIMIT 1');
     $stmt->execute([$clientId]);
     $conversation = $stmt->fetch(PDO::FETCH_ASSOC);
 

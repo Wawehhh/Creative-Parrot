@@ -24,8 +24,8 @@ try {
         $stmt->execute([$clientId]);
     }
 
-    // Get the latest conversation or create one
-    $stmt = $pdo->prepare('SELECT id FROM chat_conversations WHERE client_id = ? ORDER BY created_at DESC LIMIT 1');
+    // Get the latest ACTIVE or PENDING conversation, skip closed ones
+    $stmt = $pdo->prepare('SELECT id, status FROM chat_conversations WHERE client_id = ? AND status != "closed" ORDER BY created_at DESC LIMIT 1');
     $stmt->execute([$clientId]);
     $conversation = $stmt->fetch();
 
@@ -33,6 +33,7 @@ try {
     if ($conversation) {
         $conversationId = $conversation['id'];
     } else {
+        // If no active/pending conversation exists, create a new one
         $stmt = $pdo->prepare('INSERT INTO chat_conversations (client_id, status) VALUES (?, "pending")');
         $stmt->execute([$clientId]);
         $conversationId = $pdo->lastInsertId();

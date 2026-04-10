@@ -200,25 +200,32 @@
       
       clearChatButton.addEventListener("click", async () => {
         if (!selectedClientId) return;
-        if (!window.confirm("Delete this chat conversation permanently?")) return;
+        const status = conversationData[selectedClientId]?.status;
+        if (status !== "closed") {
+          alert("Can only delete closed conversations. Please close the chat first.");
+          return;
+        }
+        if (!window.confirm("Delete this chat conversation permanently? This cannot be undone.")) return;
         
         try {
-          // For now, just close the chat and clear locally
-          // In a production app, you'd want a delete endpoint
-          const res = await fetch(`${API_BASE}/chat-status.php`, {
+          const res = await fetch(`${API_BASE}/admin-delete.php`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ clientId: selectedClientId, status: "closed" })
+            body: JSON.stringify({ clientId: selectedClientId })
           });
           
-          if (res.ok) {
-            const clientToDelete = selectedClientId;
-            delete conversationData[clientToDelete];
+          const data = await res.json();
+          if (data.success) {
+            delete conversationData[selectedClientId];
             selectedClientId = null;
-            renderList();
+            await loadConversations();
+            alert("Conversation deleted successfully");
+          } else {
+            console.error("Failed to delete conversation:", data.error);
+            alert("Failed to delete conversation: " + (data.error || "Unknown error"));
           }
         } catch (e) {
-          console.error("Clear chat error:", e);
+          console.error("Delete chat error:", e);
           alert("Network error: " + e.message);
         }
       });
@@ -256,8 +263,38 @@
       
       refreshButton.addEventListener("click", loadConversations);
       
-      clearAllButton.addEventListener("click", () => {
-        alert("Clear all conversations feature not yet implemented. Use the clear chat button for individual conversations.");
+      clearAllButton.addEventListener("click", async () => {
+        const closedCount = Object.values(conversationData).filter(conv => conv.status === "closed").length;
+        if (closedCount === 0) {
+          alert("No closed conversations to delete.");
+          return;
+        }
+        
+        if (!window.confirm(`Delete all ${closedCount} closed conversation(s)? This cannot be undone.`)) return;
+        
+        try {
+          let deleteCount = 0;
+          for (const clientId of Object.keys(conversationData)) {
+            if (conversationData[clientId].status === "closed") {
+              const res = await fetch(`${API_BASE}/admin-delete.php`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ clientId })
+              });
+              
+              if (res.ok) {
+                deleteCount++;
+              }
+            }
+          }
+          
+          selectedClientId = null;
+          await loadConversations();
+          alert(`Deleted ${deleteCount} closed conversation(s)`);
+        } catch (e) {
+          console.error("Clear all error:", e);
+          alert("Network error: " + e.message);
+        }
       });
       
       // Initial load

@@ -2,12 +2,13 @@
 require_once __DIR__ . '/../config/db.php';
 
 try {
-    // Get all pending conversations first, then completed ones
+    // Get all active and pending conversations (skip closed ones)
     $stmt = $pdo->prepare('
         SELECT cc.id, cc.client_id, cc.status, cc.created_at, cc.updated_at, 
                COUNT(cm.id) as message_count
         FROM chat_conversations cc
         LEFT JOIN chat_messages cm ON cc.id = cm.conversation_id
+        WHERE cc.status IN ("pending", "active")
         GROUP BY cc.id
         ORDER BY 
             CASE WHEN cc.status = "pending" THEN 0 ELSE 1 END ASC,
@@ -27,6 +28,7 @@ try {
         $messagesStmt->execute([$conv['id']]);
         $messages = $messagesStmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Use clientId as key so each active/pending conversation is shown
         $result[$conv['client_id']] = [
             'conversationId' => $conv['id'],
             'status' => $conv['status'],
